@@ -35,7 +35,7 @@ public class PhoneBook {
 
         boolean isRemoved = numbers.remove(number);
         if (isRemoved && numbers.isEmpty()) {
-            numbers.remove(name);
+            phoneBookMap.remove(name);
         }
 
         return isRemoved;
