@@ -1,5 +1,8 @@
-package org.example.practice_tasks_2.producer_consumer;
+package practice_tasks_2.producer_consumer;
 
+import org.example.practice_tasks_2.producer_consumer.Consumer;
+import org.example.practice_tasks_2.producer_consumer.PoisonPillExample;
+import org.example.practice_tasks_2.producer_consumer.Producer;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.BlockingQueue;

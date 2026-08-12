@@ -1,5 +1,7 @@
-package org.example.practice_tasks_2.idempotent_initialization;
+package practice_tasks_2.idempotent_initialization;
 
+import org.example.practice_tasks_2.idempotent_initialization.ExpensiveResource;
+import org.example.practice_tasks_2.idempotent_initialization.LazyInitResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

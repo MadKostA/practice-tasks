@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Консьюмер – забирает задачи из очереди, пока не встретит POISON_PILL.
  */
-class Consumer implements Runnable {
+public class Consumer implements Runnable {
     private final BlockingQueue<String> queue;
     private final AtomicInteger consumedCount;
 

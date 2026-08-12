@@ -2,7 +2,7 @@ package org.example.practice_tasks_2.idempotent_initialization;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-class ExpensiveResource {
+public class ExpensiveResource {
     private static final AtomicInteger instanceCounter = new AtomicInteger(0);
 
     private final int id;

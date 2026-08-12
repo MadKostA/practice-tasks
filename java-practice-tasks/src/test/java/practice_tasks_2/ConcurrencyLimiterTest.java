@@ -1,5 +1,6 @@
-package org.example.practice_tasks_2;
+package practice_tasks_2;
 
+import org.example.practice_tasks_2.ConcurrencyLimiter;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.*;

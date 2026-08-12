@@ -1,7 +1,8 @@
-package org.example.practice_tasks_2;
+package practice_tasks_2;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.example.practice_tasks_2.LockFreeStack;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
 import java.util.*;

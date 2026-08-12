@@ -1,7 +1,8 @@
-package org.example.practice_tasks_2;
+package practice_tasks_2;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.example.practice_tasks_2.ParallelArraySummator;
 import org.junit.jupiter.api.*;
 import java.util.Random;
 import java.util.concurrent.*;
