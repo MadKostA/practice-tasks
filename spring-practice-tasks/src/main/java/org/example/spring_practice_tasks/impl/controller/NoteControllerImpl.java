@@ -6,6 +6,7 @@ import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 import org.example.spring_practice_tasks.api.enums.NoteExportFormat;
 import org.example.spring_practice_tasks.api.exceptions.NotValidFormatException;
+import org.example.spring_practice_tasks.api.service.ExportService;
 import org.example.spring_practice_tasks.api.service.NoteService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,9 +20,11 @@ import java.net.URI;
 public class NoteControllerImpl implements NoteController {
 
     private final NoteService noteService;
+    private final ExportService exportService;
 
-    public NoteControllerImpl(NoteService noteService) {
+    public NoteControllerImpl(NoteService noteService, ExportService exportService) {
         this.noteService = noteService;
+        this.exportService = exportService;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class NoteControllerImpl implements NoteController {
             throw new NotValidFormatException(format);
         }
 
-        byte[] exportedData = noteService.export(noteExportFormat);
+        byte[] exportedData = exportService.exportNote(noteExportFormat);
 
         MediaType mediaType = switch (noteExportFormat) {
             case JSON -> MediaType.APPLICATION_JSON;
