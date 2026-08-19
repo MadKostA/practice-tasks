@@ -3,6 +3,26 @@ spring:
     name: spring-practice-tasks
 
 server:
-  port: 8082
+  port: 8585
   servlet:
     context-path: /spt-api
+
+logging:
+  pattern:
+    console:
+      "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level - %msg%n"
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: spring-practice-tasks
