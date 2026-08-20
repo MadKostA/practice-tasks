@@ -7,7 +7,8 @@ import java.time.Instant;
 @Builder
 public record NoteModel(
         String title,
-        String content,
+        String text,
+        String author,
         Instant createdAt
 ) {
 }

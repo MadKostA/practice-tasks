@@ -15,7 +15,8 @@ public class CsvExporter implements NoteExporter {
         sb.append("title;content;createdAt\n");
         for (NoteModel note : notes) {
             sb.append(note.title()).append(';')
-                    .append(escapeCsv(note.content())).append(';')
+                    .append(escapeCsv(note.text())).append(';')
+                    .append(note.author()).append(';')
                     .append(note.createdAt()).append('\n');
         }
         return sb.toString().getBytes(StandardCharsets.UTF_8);

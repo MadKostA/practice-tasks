@@ -6,6 +6,7 @@ import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 import org.example.spring_practice_tasks.impl.model.NoteModel;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @UtilityClass
 public class NotesConverter {
@@ -13,16 +14,16 @@ public class NotesConverter {
     public static NoteModel convertDtoToModel(NoteRequestDto dto) {
         return NoteModel.builder()
                 .title(dto.title())
-                .content(dto.content())
+                .text(dto.text())
                 .createdAt(Instant.now())
                 .build();
     }
 
-    public static NoteResponseDto convertModelToDto(NoteModel model, long id) {
+    public static NoteResponseDto convertModelToDto(NoteModel model, UUID id) {
         return NoteResponseDto.builder()
                 .id(id)
                 .title(model.title())
-                .content(model.content())
+                .text(model.text())
                 .createdAt(model.createdAt())
                 .build();
     }

@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -40,7 +42,7 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
-    public ResponseEntity<NoteResponseDto> update(NoteRequestDto noteDto, Long id) {
+    public ResponseEntity<NoteResponseDto> update(NoteRequestDto noteDto, UUID id) {
         log.info("Request to update note with id={}", id);
 
         NoteResponseDto updatedNote = noteService.update(id, noteDto);
@@ -50,7 +52,7 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
-    public ResponseEntity<NoteResponseDto> get(Long id) {
+    public ResponseEntity<NoteResponseDto> get(UUID id) {
         log.info("Request to get note with id={}", id);
 
         NoteResponseDto noteResponseDto = noteService.get(id);
@@ -60,7 +62,7 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
-    public ResponseEntity<Void> delete(Long id) {
+    public ResponseEntity<Void> delete(UUID id) {
         log.info("Request to delete note with id={}", id);
 
         noteService.delete(id);

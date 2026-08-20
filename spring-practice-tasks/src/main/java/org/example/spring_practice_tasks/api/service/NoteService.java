@@ -4,6 +4,8 @@ import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 
 import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 public interface NoteService {
 
@@ -11,9 +13,11 @@ public interface NoteService {
 
     NoteResponseDto update(Long id, NoteRequestDto noteDto);
 
-    NoteResponseDto get(Long id);
+    NoteResponseDto update(UUID id, NoteRequestDto noteDto);
 
-    void delete(Long id);
+    NoteResponseDto get(UUID id);
+
+    void delete(UUID id);
 
     long getTotalNotesCount();
 

@@ -1,21 +1,12 @@
 package org.example.spring_practice_tasks.api.repo;
 
-import org.example.spring_practice_tasks.impl.model.NoteModel;
+import org.example.spring_practice_tasks.impl.entity.Note;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
+import java.util.UUID;
 
-public interface NoteRepository {
-
-    long create(NoteModel noteModel);
-
-    NoteModel update(Long id, NoteModel noteDto);
-
-    NoteModel get(Long id);
-
-    Collection<NoteModel> getAll();
-
-    void delete(Long id);
-
-    long getTotalNotesCount();
+@Repository
+public interface NoteRepository extends JpaRepository<Note, UUID> {
 
 }
