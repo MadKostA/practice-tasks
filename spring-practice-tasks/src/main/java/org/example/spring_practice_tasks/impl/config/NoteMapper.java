@@ -10,8 +10,11 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface NoteMapper {
+
+    @Mapping(target = "version", ignore = true)
     Note toEntity(NoteRequestDto noteRequestDto);
 
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateNoteFromRequestDto(NoteRequestDto noteRequestDto,
                                   @MappingTarget Note note);

@@ -1,9 +1,14 @@
 package org.example.spring_practice_tasks.impl.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,6 +41,19 @@ public class Note {
     @Version
     @Column(name = "optlock")
     private int version;
+
+    @OneToMany(
+            mappedBy = "note",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<NoteRevision> revisions = new ArrayList<>();
+
+    public void addRevision(NoteRevision revision) {
+        revisions.add(revision);
+        revision.setNote(this);
+    }
 
     @PrePersist
     public void onCreate() {

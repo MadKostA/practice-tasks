@@ -4,10 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.controller.NoteController;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
 import org.example.spring_practice_tasks.api.enums.NoteExportFormat;
 import org.example.spring_practice_tasks.api.exceptions.NotValidFormatException;
 import org.example.spring_practice_tasks.api.service.ExportService;
 import org.example.spring_practice_tasks.api.service.NoteService;
+import org.example.spring_practice_tasks.api.service.RevisionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +26,12 @@ import java.util.UUID;
 public class NoteControllerImpl implements NoteController {
 
     private final NoteService noteService;
+    private final RevisionService revisionService;
     private final ExportService exportService;
 
-    public NoteControllerImpl(NoteService noteService, ExportService exportService) {
+    public NoteControllerImpl(NoteService noteService, RevisionService revisionService, ExportService exportService) {
         this.noteService = noteService;
+        this.revisionService = revisionService;
         this.exportService = exportService;
     }
 
@@ -69,6 +75,16 @@ public class NoteControllerImpl implements NoteController {
 
         log.info("Request to get note with id={}", id);
         return ResponseEntity.ok(noteResponseDto);
+    }
+
+    @Override
+    public ResponseEntity<Page<RevisionResponseDto>> getAllHistory(Pageable pageable) {
+        log.info("Request to get all notes history");
+
+        Page<RevisionResponseDto> responseDtoList = revisionService.getAllHistory(pageable);
+
+        log.info("Request to get all notes history was successful");
+        return ResponseEntity.ok(responseDtoList);
     }
 
     @Override

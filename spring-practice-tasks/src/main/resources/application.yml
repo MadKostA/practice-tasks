@@ -23,6 +23,14 @@ logging:
   pattern:
     console:
       "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %-5level - %msg%n"
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        orm:
+          jdbc:
+            bind: TRACE
+
 
 management:
   tracing:

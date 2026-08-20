@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +26,9 @@ public interface NoteController {
 
     @GetMapping(UrlConstants.NOTE_WITH_ID_URL)
     ResponseEntity<NoteResponseDto> get(@PathVariable UUID id);
+
+    @GetMapping(UrlConstants.NOTE_HISTORY_URL)
+    ResponseEntity<Page<RevisionResponseDto>> getAllHistory(Pageable pageable);
 
     @DeleteMapping(UrlConstants.NOTE_WITH_ID_URL)
     ResponseEntity<Void> delete(@PathVariable UUID id);

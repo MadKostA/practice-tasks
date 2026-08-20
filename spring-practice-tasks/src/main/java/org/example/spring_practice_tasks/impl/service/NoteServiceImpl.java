@@ -6,9 +6,12 @@ import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
 import org.example.spring_practice_tasks.api.repo.NoteRepository;
+import org.example.spring_practice_tasks.api.repo.RevisionRepository;
 import org.example.spring_practice_tasks.api.service.NoteService;
 import org.example.spring_practice_tasks.impl.config.NoteMapper;
+import org.example.spring_practice_tasks.impl.config.RevisionMapper;
 import org.example.spring_practice_tasks.impl.entity.Note;
+import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.example.spring_practice_tasks.impl.handler.NotesLimitChecker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +26,20 @@ import java.util.UUID;
 public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository noteRepository;
+    private final RevisionRepository revisionRepository;
     private final NotesLimitChecker notesLimitChecker;
     private final NoteMapper noteMapper;
+    private final RevisionMapper revisionMapper;
 
     public NoteServiceImpl(NoteRepository noteRepository,
+                           RevisionRepository revisionRepository,
                            NotesLimitChecker notesLimitChecker,
-                           NoteMapper noteMapper) {
+                           NoteMapper noteMapper, RevisionMapper revisionMapper) {
         this.noteRepository = noteRepository;
+        this.revisionRepository = revisionRepository;
         this.notesLimitChecker = notesLimitChecker;
         this.noteMapper = noteMapper;
+        this.revisionMapper = revisionMapper;
     }
 
     @Override
@@ -74,6 +82,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public NoteResponseDto update(UUID id, NoteRequestDto noteRequestDto) {
         log.info("Updating note with id={}", id);
 
@@ -83,8 +92,11 @@ public class NoteServiceImpl implements NoteService {
                     return new NoteNotFoundException(id);
                 });
 
-        noteMapper.updateNoteFromRequestDto(noteRequestDto, existsNote);
+        NoteRevision noteRevision = revisionMapper.noteToEntity(existsNote);
+        revisionRepository.save(noteRevision);
 
+        existsNote.addRevision(noteRevision);
+        noteMapper.updateNoteFromRequestDto(noteRequestDto, existsNote);
         Note updatedNote = noteRepository.save(existsNote);
 
         log.info("Note with id={} has been updated", id);
