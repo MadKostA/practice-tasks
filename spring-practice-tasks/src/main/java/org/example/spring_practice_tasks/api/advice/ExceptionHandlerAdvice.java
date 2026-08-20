@@ -19,7 +19,7 @@ import java.util.List;
 public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponseDto> handleNotValidException(MethodArgumentNotValidException e) {
 
         List<FieldErrorDto> validationErrorsList = e.getBindingResult().getFieldErrors()
                 .stream()
@@ -34,8 +34,8 @@ public class ExceptionHandlerAdvice {
                 .body(error);
     }
 
-    @ExceptionHandler(NotValidFormatException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotValidFormat(NoteNotFoundException e) {
+    @ExceptionHandler(value = {NotValidFormatException.class, IllegalArgumentException.class})
+    public ResponseEntity<ErrorResponseDto> handleNotValidFormat(RuntimeException e) {
         ErrorResponseDto error = new ErrorResponseDto("BAD_REQUEST",
                 e.getMessage(), List.of());
 

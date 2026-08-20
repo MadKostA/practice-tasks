@@ -11,7 +11,7 @@ public interface NoteService {
 
     URI create(NoteRequestDto noteDto);
 
-    NoteResponseDto update(Long id, NoteRequestDto noteDto);
+    void createBatch(List<NoteRequestDto> notesList);
 
     NoteResponseDto update(UUID id, NoteRequestDto noteDto);
 

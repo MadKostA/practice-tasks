@@ -15,6 +15,9 @@ public interface NoteController {
     @PostMapping(UrlConstants.NOTE_URL)
     ResponseEntity<NoteResponseDto> create(@Valid @RequestBody NoteRequestDto noteDto);
 
+    @PostMapping(UrlConstants.NOTE_BATCH_URL)
+    ResponseEntity<NoteResponseDto> createBatch(@Valid @RequestBody List<NoteRequestDto> notesList);
+
     @PutMapping(UrlConstants.NOTE_WITH_ID_URL)
     ResponseEntity<NoteResponseDto> update(@Valid @RequestBody NoteRequestDto noteDto, @PathVariable UUID id);
 

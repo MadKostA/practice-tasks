@@ -42,6 +42,16 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
+    public ResponseEntity<NoteResponseDto> createBatch(List<NoteRequestDto> notesList) {
+        log.info("Request to save list of notes, list size={}", notesList.size());
+
+        noteService.createBatch(notesList);
+
+        log.info("Request to save list of notes was finished");
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
     public ResponseEntity<NoteResponseDto> update(NoteRequestDto noteDto, UUID id) {
         log.info("Request to update note with id={}", id);
 

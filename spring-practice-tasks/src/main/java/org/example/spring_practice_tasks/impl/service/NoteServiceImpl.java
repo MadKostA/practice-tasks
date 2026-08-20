@@ -53,7 +53,26 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public NoteResponseDto update(Long id, NoteRequestDto noteDto) {
+    @Transactional
+    public void createBatch(List<NoteRequestDto> notesList) {
+
+        if (CollectionUtils.isEmpty(notesList)) {
+            throw new IllegalArgumentException("В списке должна присутствовать хотя бы одна заметка");
+        }
+
+        long currentTotalNotesCount = getTotalNotesCount();
+
+        for (NoteRequestDto requestDto : notesList) {
+            Note entity = noteMapper.toEntity(requestDto);
+
+            notesLimitChecker.checkNotesLimit(currentTotalNotesCount);
+            noteRepository.save(entity);
+
+            currentTotalNotesCount++;
+        }
+
+    }
+
     @Override
     public NoteResponseDto update(UUID id, NoteRequestDto noteRequestDto) {
         log.info("Updating note with id={}", id);
