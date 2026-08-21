@@ -1,7 +1,9 @@
 package org.example.spring_practice_tasks.impl.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
+import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
@@ -13,16 +15,23 @@ import org.example.spring_practice_tasks.impl.config.RevisionMapper;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.example.spring_practice_tasks.impl.handler.NotesLimitChecker;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository noteRepository;
@@ -30,19 +39,10 @@ public class NoteServiceImpl implements NoteService {
     private final NotesLimitChecker notesLimitChecker;
     private final NoteMapper noteMapper;
     private final RevisionMapper revisionMapper;
-
-    public NoteServiceImpl(NoteRepository noteRepository,
-                           RevisionRepository revisionRepository,
-                           NotesLimitChecker notesLimitChecker,
-                           NoteMapper noteMapper, RevisionMapper revisionMapper) {
-        this.noteRepository = noteRepository;
-        this.revisionRepository = revisionRepository;
-        this.notesLimitChecker = notesLimitChecker;
-        this.noteMapper = noteMapper;
-        this.revisionMapper = revisionMapper;
-    }
+    private final CacheManager cacheManager;
 
     @Override
+    @CacheEvict(cacheNames = "noteStats", key = "#noteRequestDto.author")
     public URI create(NoteRequestDto noteRequestDto) {
         log.info("Creating new note with title='{}'", noteRequestDto.title());
 
@@ -62,6 +62,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "noteStats", key = "#notesList.get(0).author")
     public void createBatch(List<NoteRequestDto> notesList) {
 
         if (CollectionUtils.isEmpty(notesList)) {
@@ -83,6 +84,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "noteStats", key = "#noteRequestDto.author")
     public NoteResponseDto update(UUID id, NoteRequestDto noteRequestDto) {
         log.info("Updating note with id={}", id);
 
@@ -93,10 +95,12 @@ public class NoteServiceImpl implements NoteService {
                 });
 
         NoteRevision noteRevision = revisionMapper.noteToEntity(existsNote);
-        revisionRepository.save(noteRevision);
 
         existsNote.addRevision(noteRevision);
         noteMapper.updateNoteFromRequestDto(noteRequestDto, existsNote);
+
+        revisionRepository.save(noteRevision);
+
         Note updatedNote = noteRepository.save(existsNote);
 
         log.info("Note with id={} has been updated", id);
@@ -118,10 +122,32 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Cacheable(cacheNames = "noteStats", key = "#author")
+    public NoteAuthorStatsResponseDto getStatsByAuthor(String author) {
+        log.info("Get note stats by author={}", author);
+
+        NoteAuthorStatsResponseDto statsByAuthor = noteRepository.findStatsByAuthor(author);
+
+        log.info("Got note stats by author successfully");
+        return statsByAuthor;
+    }
+
+    @Override
     public void delete(UUID id) {
         log.info("Deleting note with id={}", id);
 
+        Optional<Note> noteOptional = noteRepository.findById(id);
+        if (noteOptional.isEmpty()) {
+            log.info("Note with id={} not present", id);
+            return;
+        }
+
         noteRepository.deleteById(id);
+
+        Cache cache = cacheManager.getCache("noteStats");
+        if (cache != null) {
+            cache.evict(noteOptional.get().getAuthor());
+        }
 
         log.info("Note with id={} has been deleted", id);
     }

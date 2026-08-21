@@ -14,5 +14,6 @@ public class UrlConstants {
     public static final String NOTE_EXPORT_URL = NOTE_URL + "/export";
     public static final String NOTE_BATCH_URL = NOTE_URL + "/batch";
     public static final String NOTE_HISTORY_URL = NOTE_URL + "/history";
+    public static final String NOTE_STATS_URL = NOTE_URL + "/stats";
 
 }

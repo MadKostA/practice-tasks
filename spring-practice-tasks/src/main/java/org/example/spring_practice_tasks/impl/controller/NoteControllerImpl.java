@@ -2,6 +2,7 @@ package org.example.spring_practice_tasks.impl.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.controller.NoteController;
+import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
@@ -83,8 +84,18 @@ public class NoteControllerImpl implements NoteController {
 
         Page<RevisionResponseDto> responseDtoList = revisionService.getAllHistory(pageable);
 
-        log.info("Request to get all notes history was successful");
+        log.info("Request to get all notes history was finished");
         return ResponseEntity.ok(responseDtoList);
+    }
+
+    @Override
+    public ResponseEntity<NoteAuthorStatsResponseDto> getStatsByAuthor(String author) {
+        log.info("Request for statistics on author={} notes", author);
+
+        NoteAuthorStatsResponseDto responseDto = noteService.getStatsByAuthor(author);
+
+        log.info("Request for statistics on author notes was finished");
+        return ResponseEntity.ok(responseDto);
     }
 
     @Override

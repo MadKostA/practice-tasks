@@ -29,7 +29,7 @@ public class Note {
     @Column(name = "text", columnDefinition = "TEXT")
     private String text;
 
-    @Column(name = "author")
+    @Column(name = "author", unique = true)
     private String author;
 
     @Column(name = "created_at")

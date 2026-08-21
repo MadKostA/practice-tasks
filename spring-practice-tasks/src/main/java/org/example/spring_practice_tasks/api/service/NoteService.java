@@ -1,5 +1,6 @@
 package org.example.spring_practice_tasks.api.service;
 
+import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 
@@ -16,6 +17,8 @@ public interface NoteService {
     NoteResponseDto update(UUID id, NoteRequestDto noteDto);
 
     NoteResponseDto get(UUID id);
+
+    NoteAuthorStatsResponseDto getStatsByAuthor(String author);
 
     void delete(UUID id);
 
