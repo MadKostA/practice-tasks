@@ -1,0 +1,41 @@
+{
+  "content": [
+    {
+      "noteId": "bb57298f-13ad-4ccb-8519-9c64e8288c0b",
+      "oldTitle": "test",
+      "oldText": "test",
+      "changedAt": "2026-08-21T13:51:08.897Z"
+    },
+    {
+      "noteId": "bb57298f-13ad-4ccb-8519-9c64e8288c0b",
+      "oldTitle": "test0",
+      "oldText": "test0",
+      "changedAt": "2026-08-21T13:53:23.310Z"
+    }
+  ],
+  "empty": false,
+  "first": true,
+  "last": false,
+  "number": 0,
+  "numberOfElements": 2,
+  "pageable": {
+    "offset": 0,
+    "pageNumber": 0,
+    "pageSize": 2,
+    "paged": true,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "unpaged": false
+  },
+  "size": 2,
+  "sort": {
+    "empty": true,
+    "sorted": false,
+    "unsorted": true
+  },
+  "totalElements": 3,
+  "totalPages": 2
+}
