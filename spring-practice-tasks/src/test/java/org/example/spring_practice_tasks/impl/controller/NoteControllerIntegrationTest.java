@@ -3,7 +3,7 @@ package org.example.spring_practice_tasks.impl.controller;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
-import org.example.spring_practice_tasks.api.repo.NoteRepository;
+import org.example.spring_practice_tasks.impl.repo.NoteRepository;
 import org.example.spring_practice_tasks.config.AbstractIntegrationTests;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.junit.jupiter.api.DisplayName;
@@ -291,7 +291,8 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
             // when
             ResultActions result = mockMvc.perform(get(UrlConstants.NOTE_HISTORY_URL)
                             .param("page", "0")
-                            .param("size", "2"))
+                            .param("size", "2")
+                            .param("sort", "changedAt,asc"))
                     .andDo(print());
 
             // then

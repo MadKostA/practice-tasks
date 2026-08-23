@@ -2,11 +2,7 @@ package org.example.spring_practice_tasks.api.controller;
 
 import jakarta.validation.Valid;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
-import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
-import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
-import org.springframework.data.domain.Page;
+import org.example.spring_practice_tasks.api.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +25,7 @@ public interface NoteController {
     ResponseEntity<NoteResponseDto> get(@PathVariable UUID id);
 
     @GetMapping(UrlConstants.NOTE_HISTORY_URL)
-    ResponseEntity<Page<RevisionResponseDto>> getAllHistory(Pageable pageable);
+    ResponseEntity<PageResponseDto> getAllHistory(Pageable pageable);
 
     @GetMapping(UrlConstants.NOTE_STATS_URL)
     ResponseEntity<NoteAuthorStatsResponseDto> getStatsByAuthor(@RequestParam String author);

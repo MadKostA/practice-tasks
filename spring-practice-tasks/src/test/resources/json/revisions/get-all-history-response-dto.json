@@ -1,5 +1,5 @@
 {
-  "content": [
+  "elements": [
     {
       "noteId": "bb57298f-13ad-4ccb-8519-9c64e8288c0b",
       "oldTitle": "test",
@@ -13,29 +13,14 @@
       "changedAt": "2026-08-21T13:53:23.310Z"
     }
   ],
-  "empty": false,
-  "first": true,
-  "last": false,
-  "number": 0,
-  "numberOfElements": 2,
-  "pageable": {
-    "offset": 0,
-    "pageNumber": 0,
-    "pageSize": 2,
-    "paged": true,
-    "sort": {
-      "empty": true,
-      "sorted": false,
-      "unsorted": true
-    },
-    "unpaged": false
-  },
+  "page": 0,
   "size": 2,
-  "sort": {
-    "empty": true,
-    "sorted": false,
-    "unsorted": true
-  },
   "totalElements": 3,
-  "totalPages": 2
+  "totalPages": 2,
+  "sort": [
+    {
+      "field": "changedAt",
+      "direction": "ASC"
+    }
+  ]
 }

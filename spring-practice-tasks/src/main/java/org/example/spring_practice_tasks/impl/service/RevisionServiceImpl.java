@@ -1,13 +1,14 @@
 package org.example.spring_practice_tasks.impl.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.spring_practice_tasks.api.dto.PageResponseDto;
 import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
-import org.example.spring_practice_tasks.api.repo.RevisionRepository;
+import org.example.spring_practice_tasks.api.dto.SortResponseDto;
+import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
 import org.example.spring_practice_tasks.api.service.RevisionService;
 import org.example.spring_practice_tasks.impl.config.RevisionMapper;
 import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +28,24 @@ public class RevisionServiceImpl implements RevisionService {
     }
 
     @Override
-    public Page<RevisionResponseDto> getAllHistory(Pageable pageable) {
-        log.info("Getting all notes history page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+    public PageResponseDto getAllHistory(Pageable pageable) {
+        log.info("Getting all notes history responsePage={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
 
-        Page<NoteRevision> page = revisionRepository.findAll(pageable);
+        Page<NoteRevision> responsePage = revisionRepository.findAll(pageable);
 
-        List<RevisionResponseDto> list = page.get().map(revisionMapper::toResponseDto).toList();
+        List<RevisionResponseDto> list = responsePage.get().map(revisionMapper::toResponseDto).toList();
 
-        return new PageImpl<>(list, pageable, page.getTotalElements());
+        List<SortResponseDto> sortFieldsList = pageable.getSort()
+                .stream().map(sort -> new SortResponseDto(sort.getProperty(), sort.getDirection().name()))
+                .toList();
+
+        return PageResponseDto.builder()
+                .elements(list)
+                .page(responsePage.getNumber())
+                .size(responsePage.getSize())
+                .totalElements(responsePage.getTotalElements())
+                .totalPages(responsePage.getTotalPages())
+                .sort(sortFieldsList)
+                .build();
     }
 }
