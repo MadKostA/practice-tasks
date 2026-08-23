@@ -1,10 +1,8 @@
 package org.example.spring_practice_tasks.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
@@ -13,21 +11,10 @@ import java.io.*;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ResourceUtils {
 
     private final ObjectMapper objectMapper;
-
-    public ResourceUtils(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    public ResourceUtils() {
-        this.objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
-    }
 
     public String getJsonFromResources(String resourcesPath, Class<?> targetClass) throws IOException {
         InputStream resourceAsStream = getInputStreamFromResources(resourcesPath);
