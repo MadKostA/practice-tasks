@@ -1,5 +1,6 @@
 package org.example.spring_practice_tasks.impl.service;
 
+import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
@@ -40,6 +41,7 @@ public class NoteServiceImpl implements NoteService {
     private final NoteMapper noteMapper;
     private final RevisionMapper revisionMapper;
     private final CacheManager cacheManager;
+    private final Counter notesCreatedCounter;
 
     @Override
     @CacheEvict(cacheNames = "noteStats", key = "#noteRequestDto.author")
@@ -50,6 +52,8 @@ public class NoteServiceImpl implements NoteService {
 
         Note note = noteMapper.toEntity(noteRequestDto);
         Note savedNote = noteRepository.save(note);
+
+        notesCreatedCounter.increment();
 
         log.info("Note with title '{}' has been saved with id={}", savedNote.getTitle(), savedNote.getId());
 
@@ -80,6 +84,7 @@ public class NoteServiceImpl implements NoteService {
             currentTotalNotesCount++;
         }
 
+        notesCreatedCounter.increment(currentTotalNotesCount);
     }
 
     @Override
