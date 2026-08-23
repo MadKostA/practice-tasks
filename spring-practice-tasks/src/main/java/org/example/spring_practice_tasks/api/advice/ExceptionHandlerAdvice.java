@@ -6,6 +6,7 @@ import org.example.spring_practice_tasks.api.dto.error.FieldErrorDto;
 import org.example.spring_practice_tasks.api.exceptions.NotValidFormatException;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
 import org.example.spring_practice_tasks.api.exceptions.NotesCountLimitException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -60,6 +61,16 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(error);
     }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotesCountLimitException(OptimisticLockingFailureException e) {
+        ErrorResponseDto error = new ErrorResponseDto("CONFLICT",
+                e.getMessage(), List.of());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(error);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleAllExceptions(Exception e) {

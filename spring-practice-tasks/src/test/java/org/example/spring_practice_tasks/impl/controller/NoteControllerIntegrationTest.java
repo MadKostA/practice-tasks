@@ -3,20 +3,27 @@ package org.example.spring_practice_tasks.impl.controller;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.repo.NoteRepository;
 import org.example.spring_practice_tasks.config.AbstractIntegrationTests;
+import org.example.spring_practice_tasks.impl.entity.Note;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -26,6 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
+
+    @Autowired
+    private NoteRepository noteRepository;
 
     private static final UUID NOTE_ID = UUID.fromString("bb57298f-13ad-4ccb-8519-9c64e8288c0b");
 
@@ -157,6 +167,75 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
             // then
             result.andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message").value(errorMessage));
+        }
+
+        @RepeatedTest(value = 10)
+        @DisplayName("Должен в одном потоке обновить существующую заметку, а в другом потоке выбрасить OptimisticLockingFailureException")
+        @Sql("/sql/insert-note.sql")
+        void throwOptimisticLocking() throws Exception {
+            // given
+            String errorMessage = "Unexpected row count (expected row count 1 but was 0)";
+            ExecutorService executor = Executors.newFixedThreadPool(2);
+            CyclicBarrier barrier = new CyclicBarrier(2);
+
+            NoteRequestDto requestDtoThread1 = new NoteRequestDto("thread 1", "thread 1", "test1");
+            String requestJsonThread1 = objectMapper.writeValueAsString(requestDtoThread1);
+
+            NoteRequestDto requestDtoThread2 = new NoteRequestDto("thread 2", "thread 2", "test1");
+            String requestJsonThread2 = objectMapper.writeValueAsString(requestDtoThread2);
+
+            AtomicReference<ResultActions> resultActions1 = new AtomicReference<>();
+            AtomicReference<ResultActions> resultActions2 = new AtomicReference<>();
+
+            // when
+            executor.submit(() -> {
+                try {
+                    barrier.await();
+                    resultActions1.set(
+                            mockMvc.perform(put(UrlConstants.NOTE_WITH_ID_URL, NOTE_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestJsonThread1)));
+                } catch (BrokenBarrierException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            executor.submit(() -> {
+                try {
+                    barrier.await();
+                    resultActions2.set(
+                            mockMvc.perform(put(UrlConstants.NOTE_WITH_ID_URL, NOTE_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestJsonThread2))
+                    );
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            executor.shutdown();
+            executor.awaitTermination(2, TimeUnit.SECONDS);
+
+            // then
+            if (resultActions1.get().andReturn().getResolvedException() != null) {
+                Exception resolvedException = resultActions1.get().andReturn().getResolvedException();
+                assertThat(resolvedException.getClass())
+                        .isEqualTo(ObjectOptimisticLockingFailureException.class);
+                assertThat(resolvedException.getMessage())
+                        .contains(errorMessage);
+            } else if (resultActions2.get().andReturn().getResolvedException() != null) {
+                Exception resolvedException = resultActions2.get().andReturn().getResolvedException();
+                assertThat(resolvedException.getClass())
+                        .isEqualTo(ObjectOptimisticLockingFailureException.class);
+                assertThat(resolvedException.getMessage())
+                        .contains(errorMessage);
+            }
+
+            Note updatedNote = noteRepository.findById(NOTE_ID).orElseThrow();
+            assertThat(updatedNote.getVersion()).isEqualTo(1);
+            assertThat(updatedNote.getTitle()).contains("thread");
+            assertThat(updatedNote.getText()).contains("thread");
         }
 
     }
