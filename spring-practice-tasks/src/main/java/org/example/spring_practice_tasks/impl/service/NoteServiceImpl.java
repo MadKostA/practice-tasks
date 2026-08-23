@@ -7,9 +7,10 @@ import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.exceptions.IncorrectAuthorException;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
-import org.example.spring_practice_tasks.api.repo.NoteRepository;
-import org.example.spring_practice_tasks.api.repo.RevisionRepository;
+import org.example.spring_practice_tasks.impl.repo.NoteRepository;
+import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
 import org.example.spring_practice_tasks.api.service.NoteService;
 import org.example.spring_practice_tasks.impl.config.NoteMapper;
 import org.example.spring_practice_tasks.impl.config.RevisionMapper;
@@ -98,6 +99,12 @@ public class NoteServiceImpl implements NoteService {
                     log.error("Not found note with id={}", id);
                     return new NoteNotFoundException(id);
                 });
+
+        if (!noteRequestDto.author().equals(existsNote.getAuthor())) {
+            String author = noteRequestDto.author();
+            log.error("Incorrect author '{}'", author);
+            throw new IncorrectAuthorException(noteRequestDto.author());
+        }
 
         NoteRevision noteRevision = revisionMapper.noteToEntity(existsNote);
 

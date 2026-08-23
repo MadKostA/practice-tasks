@@ -3,6 +3,7 @@ package org.example.spring_practice_tasks.api.advice;
 import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.dto.error.ErrorResponseDto;
 import org.example.spring_practice_tasks.api.dto.error.FieldErrorDto;
+import org.example.spring_practice_tasks.api.exceptions.IncorrectAuthorException;
 import org.example.spring_practice_tasks.api.exceptions.NotValidFormatException;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
 import org.example.spring_practice_tasks.api.exceptions.NotesCountLimitException;
@@ -35,7 +36,8 @@ public class ExceptionHandlerAdvice {
                 .body(error);
     }
 
-    @ExceptionHandler(value = {NotValidFormatException.class, IllegalArgumentException.class})
+    @ExceptionHandler(value = {NotValidFormatException.class,
+            IllegalArgumentException.class, IncorrectAuthorException.class})
     public ResponseEntity<ErrorResponseDto> handleNotValidFormat(RuntimeException e) {
         ErrorResponseDto error = new ErrorResponseDto("BAD_REQUEST",
                 e.getMessage(), List.of());
