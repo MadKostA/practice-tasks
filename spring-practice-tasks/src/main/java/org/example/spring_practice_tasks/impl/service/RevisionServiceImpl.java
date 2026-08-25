@@ -6,7 +6,7 @@ import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
 import org.example.spring_practice_tasks.api.dto.SortResponseDto;
 import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
 import org.example.spring_practice_tasks.api.service.RevisionService;
-import org.example.spring_practice_tasks.impl.config.RevisionMapper;
+import org.example.spring_practice_tasks.impl.util.RevisionMapper;
 import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

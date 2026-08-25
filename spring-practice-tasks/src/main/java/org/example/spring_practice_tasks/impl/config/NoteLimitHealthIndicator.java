@@ -1,6 +1,7 @@
 package org.example.spring_practice_tasks.impl.config;
 
 import org.example.spring_practice_tasks.api.service.NoteService;
+import org.example.spring_practice_tasks.impl.config.notes_count.ProfileSettingsConfig;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package org.example.spring_practice_tasks.impl.config;
+package org.example.spring_practice_tasks.impl.config.notes_count;
 
 import lombok.Getter;
 import lombok.Setter;
