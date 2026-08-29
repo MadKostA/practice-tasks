@@ -3,18 +3,19 @@ package org.example.spring_practice_tasks.api.repo;
 import org.example.spring_practice_tasks.impl.model.NoteModel;
 
 import java.util.Collection;
+import java.util.UUID;
 
-public interface NoteRepository {
+public interface NoteMapRepository {
 
-    long create(NoteModel noteModel);
+    UUID create(NoteModel noteModel);
 
-    NoteModel update(Long id, NoteModel noteDto);
+    NoteModel update(UUID id, NoteModel noteDto);
 
-    NoteModel get(Long id);
+    NoteModel get(UUID id);
 
     Collection<NoteModel> getAll();
 
-    void delete(Long id);
+    void delete(UUID id);
 
     long getTotalNotesCount();
 

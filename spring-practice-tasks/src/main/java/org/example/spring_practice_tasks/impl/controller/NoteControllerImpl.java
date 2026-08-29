@@ -2,28 +2,33 @@ package org.example.spring_practice_tasks.impl.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.controller.NoteController;
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.*;
 import org.example.spring_practice_tasks.api.enums.NoteExportFormat;
 import org.example.spring_practice_tasks.api.exceptions.NotValidFormatException;
 import org.example.spring_practice_tasks.api.service.ExportService;
 import org.example.spring_practice_tasks.api.service.NoteService;
+import org.example.spring_practice_tasks.api.service.RevisionService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @Slf4j
 public class NoteControllerImpl implements NoteController {
 
     private final NoteService noteService;
+    private final RevisionService revisionService;
     private final ExportService exportService;
 
-    public NoteControllerImpl(NoteService noteService, ExportService exportService) {
+    public NoteControllerImpl(NoteService noteService, RevisionService revisionService, ExportService exportService) {
         this.noteService = noteService;
+        this.revisionService = revisionService;
         this.exportService = exportService;
     }
 
@@ -40,7 +45,17 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
-    public ResponseEntity<NoteResponseDto> update(NoteRequestDto noteDto, Long id) {
+    public ResponseEntity<NoteResponseDto> createBatch(List<NoteRequestDto> notesList) {
+        log.info("Request to save list of notes, list size={}", notesList.size());
+
+        noteService.createBatch(notesList);
+
+        log.info("Request to save list of notes was finished");
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<NoteResponseDto> update(NoteRequestDto noteDto, UUID id) {
         log.info("Request to update note with id={}", id);
 
         NoteResponseDto updatedNote = noteService.update(id, noteDto);
@@ -50,7 +65,7 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
-    public ResponseEntity<NoteResponseDto> get(Long id) {
+    public ResponseEntity<NoteResponseDto> get(UUID id) {
         log.info("Request to get note with id={}", id);
 
         NoteResponseDto noteResponseDto = noteService.get(id);
@@ -60,7 +75,27 @@ public class NoteControllerImpl implements NoteController {
     }
 
     @Override
-    public ResponseEntity<Void> delete(Long id) {
+    public ResponseEntity<PageResponseDto> getAllHistory(Pageable pageable) {
+        log.info("Request to get all notes history");
+
+        PageResponseDto responseDtoList = revisionService.getAllHistory(pageable);
+
+        log.info("Request to get all notes history was finished");
+        return ResponseEntity.ok(responseDtoList);
+    }
+
+    @Override
+    public ResponseEntity<NoteAuthorStatsResponseDto> getStatsByAuthor(String author) {
+        log.info("Request for statistics on author={} notes", author);
+
+        NoteAuthorStatsResponseDto responseDto = noteService.getStatsByAuthor(author);
+
+        log.info("Request for statistics on author notes was finished");
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Override
+    public ResponseEntity<Void> delete(UUID id) {
         log.info("Request to delete note with id={}", id);
 
         noteService.delete(id);

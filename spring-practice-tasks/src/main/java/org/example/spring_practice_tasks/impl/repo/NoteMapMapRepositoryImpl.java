@@ -1,35 +1,35 @@
 package org.example.spring_practice_tasks.impl.repo;
 
-import org.example.spring_practice_tasks.api.repo.NoteRepository;
+import org.example.spring_practice_tasks.api.repo.NoteMapRepository;
 import org.example.spring_practice_tasks.impl.model.NoteModel;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class NoteRepositoryImpl implements NoteRepository {
+@Deprecated
+public class NoteMapMapRepositoryImpl implements NoteMapRepository {
 
-    private final ConcurrentMap<Long, NoteModel> NOTES_DB = new ConcurrentHashMap<>();
-    private final AtomicLong id = new AtomicLong(0);
+    private final ConcurrentMap<UUID, NoteModel> NOTES_DB = new ConcurrentHashMap<>();
 
     @Override
-    public long create(NoteModel noteModel) {
-        long noteId = id.incrementAndGet();
+    public UUID create(NoteModel noteModel) {
+        UUID noteId = UUID.randomUUID();
         NOTES_DB.put(noteId, noteModel);
 
         return noteId;
     }
 
     @Override
-    public NoteModel update(Long id, NoteModel noteModel) {
+    public NoteModel update(UUID id, NoteModel noteModel) {
         return NOTES_DB.computeIfPresent(id, (key, value) -> noteModel);
     }
 
     @Override
-    public NoteModel get(Long id) {
+    public NoteModel get(UUID id) {
         return NOTES_DB.get(id);
     }
 
@@ -39,7 +39,7 @@ public class NoteRepositoryImpl implements NoteRepository {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
         NOTES_DB.remove(id);
     }
 
