@@ -1,20 +1,37 @@
 package org.example.spring_practice_tasks.impl.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "note_event_log")
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class NoteEventLog {
 
+    @Id
+    private UUID eventId;
 
+    private UUID noteId;
 
+    private String author;
+
+    private String eventType;
+
+    private Instant occurredAt;
+
+    private Instant receivedAt;
+
+    @PrePersist
+    public void onCreate() {
+        receivedAt = Instant.now();
+    }
 }
