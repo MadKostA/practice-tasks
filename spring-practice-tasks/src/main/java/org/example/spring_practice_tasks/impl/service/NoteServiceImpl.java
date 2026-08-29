@@ -9,14 +9,18 @@ import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
 import org.example.spring_practice_tasks.api.exceptions.IncorrectAuthorException;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
-import org.example.spring_practice_tasks.impl.repo.NoteRepository;
-import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
 import org.example.spring_practice_tasks.api.service.NoteService;
-import org.example.spring_practice_tasks.impl.util.NoteMapper;
-import org.example.spring_practice_tasks.impl.util.RevisionMapper;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.example.spring_practice_tasks.impl.handler.NotesLimitChecker;
+import org.example.spring_practice_tasks.impl.model.EventType;
+import org.example.spring_practice_tasks.impl.model.kafka.NoteEvent;
+import org.example.spring_practice_tasks.impl.repo.NoteRepository;
+import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
+import org.example.spring_practice_tasks.impl.service.kafka.NotesSender;
+import org.example.spring_practice_tasks.impl.util.NoteMapper;
+import org.example.spring_practice_tasks.impl.util.NotesConverter;
+import org.example.spring_practice_tasks.impl.util.RevisionMapper;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,6 +47,7 @@ public class NoteServiceImpl implements NoteService {
     private final RevisionMapper revisionMapper;
     private final CacheManager cacheManager;
     private final Counter notesCreatedCounter;
+    private final NotesSender notesSender;
 
     @Override
     @CacheEvict(cacheNames = "noteStats", key = "#noteRequestDto.author")
@@ -55,6 +60,8 @@ public class NoteServiceImpl implements NoteService {
         Note savedNote = noteRepository.save(note);
 
         notesCreatedCounter.increment();
+
+        sendKafkaNoteMessage(savedNote, EventType.CREATED);
 
         log.info("Note with title '{}' has been saved with id={}", savedNote.getTitle(), savedNote.getId());
 
@@ -115,6 +122,8 @@ public class NoteServiceImpl implements NoteService {
 
         Note updatedNote = noteRepository.save(existsNote);
 
+        sendKafkaNoteMessage(updatedNote, EventType.UPDATED);
+
         log.info("Note with id={} has been updated", id);
         return noteMapper.toResponseDto(updatedNote);
     }
@@ -156,6 +165,8 @@ public class NoteServiceImpl implements NoteService {
 
         noteRepository.deleteById(id);
 
+        sendKafkaNoteMessage(noteOptional.get(), EventType.DELETED);
+
         Cache cache = cacheManager.getCache("noteStats");
         if (cache != null) {
             cache.evict(noteOptional.get().getAuthor());
@@ -169,6 +180,11 @@ public class NoteServiceImpl implements NoteService {
         log.info("Getting total notes count");
 
         return noteRepository.count();
+    }
+
+    private void sendKafkaNoteMessage(Note noteEntity, EventType eventType) {
+        NoteEvent noteEvent = NotesConverter.convertEntityToNoteEvent(noteEntity, eventType);
+        notesSender.sendMessage(noteEntity.getId(), noteEvent);
     }
 
 }
