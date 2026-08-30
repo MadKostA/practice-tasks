@@ -62,6 +62,7 @@ logging:
         SQL: DEBUG
       springframework:
         kafka: WARN
+        security: DEBUG
       apache:
         kafka: WARN
     kafka: WARN

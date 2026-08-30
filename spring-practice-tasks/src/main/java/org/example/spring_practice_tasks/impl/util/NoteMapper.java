@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface NoteMapper {
 
     @Mapping(target = "version", ignore = true)
-    Note toEntity(NoteRequestDto noteRequestDto);
+    Note toEntity(NoteRequestDto noteRequestDto, String author);
 
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

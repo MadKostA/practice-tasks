@@ -10,6 +10,8 @@ import org.example.spring_practice_tasks.api.exceptions.NotesCountLimitException
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,7 +27,7 @@ public class ExceptionHandlerAdvice {
 
         List<FieldErrorDto> validationErrorsList = e.getBindingResult().getFieldErrors()
                 .stream()
-                .map( fieldError -> new FieldErrorDto(fieldError.getField(), fieldError.getDefaultMessage()))
+                .map(fieldError -> new FieldErrorDto(fieldError.getField(), fieldError.getDefaultMessage()))
                 .toList();
 
         ErrorResponseDto error = new ErrorResponseDto("VALIDATION_ERROR",
@@ -37,12 +39,30 @@ public class ExceptionHandlerAdvice {
     }
 
     @ExceptionHandler(value = {NotValidFormatException.class,
-            IllegalArgumentException.class, IncorrectAuthorException.class})
+            IllegalArgumentException.class})
     public ResponseEntity<ErrorResponseDto> handleNotValidFormat(RuntimeException e) {
         ErrorResponseDto error = new ErrorResponseDto("BAD_REQUEST",
                 e.getMessage(), List.of());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(error);
+    }
+
+    @ExceptionHandler(value = {AccessDeniedException.class, IncorrectAuthorException.class})
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(RuntimeException e) {
+        ErrorResponseDto error = new ErrorResponseDto("FORBIDDEN",
+                e.getMessage(), List.of());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(error);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotFound(AuthenticationException e) {
+        ErrorResponseDto error = new ErrorResponseDto("UNAUTHORIZED",
+                e.getMessage(), List.of());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(error);
     }
 
@@ -79,7 +99,7 @@ public class ExceptionHandlerAdvice {
         log.error("Some exception has been thrown: {}", e.getMessage());
 
         ErrorResponseDto error = new ErrorResponseDto("INTERNAL_ERROR",
-                "Произошла ошибка на сервере: "  + e.getMessage(), List.of());
+                "Произошла ошибка на сервере: " + e.getMessage(), List.of());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(error);
