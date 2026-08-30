@@ -1,11 +1,11 @@
 package org.example.spring_practice_tasks.impl.controller;
 
+import org.example.spring_practice_tasks.AbstractIntegrationTests;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
-import org.example.spring_practice_tasks.impl.repo.NoteRepository;
-import org.example.spring_practice_tasks.config.AbstractIntegrationTests;
 import org.example.spring_practice_tasks.impl.entity.Note;
+import org.example.spring_practice_tasks.impl.repo.NoteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
@@ -46,7 +46,7 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
         @DisplayName("Должен вернуть 201 и ссылку на созданный объект")
         void createOk() throws Exception {
             // given
-            NoteRequestDto requestDto = new NoteRequestDto("test", "test", "test1");
+            NoteRequestDto requestDto = new NoteRequestDto("test", "test");
             String requestJson = objectMapper.writeValueAsString(requestDto);
             String responseLocation = "http://localhost/notes/";
 
@@ -85,18 +85,14 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
 
         public static Stream<Arguments> createNotValidDataSource() {
             return Stream.of(
-                    Arguments.of(named("Title is null", new NoteRequestDto(null, "test", "test1")),
+                    Arguments.of(named("Title is null", new NoteRequestDto(null, "test")),
                             "Заголовок заметки должен должен быть заполнен"),
-                    Arguments.of(named("Title is blank", new NoteRequestDto(" ", "test", "test1")),
+                    Arguments.of(named("Title is blank", new NoteRequestDto(" ", "test")),
                             "Заголовок заметки должен должен быть заполнен"),
-                    Arguments.of(named("Text is null", new NoteRequestDto("test", null, "test1")),
+                    Arguments.of(named("Text is null", new NoteRequestDto("test", null)),
                             "Текст заметки должен должен быть заполнен"),
-                    Arguments.of(named("Text is blank", new NoteRequestDto("test", " ", "test1")),
-                            "Текст заметки должен должен быть заполнен"),
-                    Arguments.of(named("Author is null", new NoteRequestDto("test", "test", null)),
-                            "Автор заметки должен быть заполнен"),
-                    Arguments.of(named("Author is blank", new NoteRequestDto("test", "test", " ")),
-                            "Автор заметки должен быть заполнен")
+                    Arguments.of(named("Text is blank", new NoteRequestDto("test", " ")),
+                            "Текст заметки должен должен быть заполнен")
             );
         }
     }
@@ -109,8 +105,8 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
         void createOk() throws Exception {
             // given
             List<NoteRequestDto> requestDtos = List.of(
-                    new NoteRequestDto("test1", "test1", "test1"),
-                    new NoteRequestDto("test2", "test2", "test1")
+                    new NoteRequestDto("test1", "test1"),
+                    new NoteRequestDto("test2", "test2")
             );
             String requestJson = objectMapper.writeValueAsString(requestDtos);
 
@@ -134,7 +130,7 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
         @Sql("/sql/insert-note.sql")
         void updateOk() throws Exception {
             // given
-            NoteRequestDto requestDto = new NoteRequestDto("updated", "updated", "test1");
+            NoteRequestDto requestDto = new NoteRequestDto("updated", "updated");
             String requestJson = objectMapper.writeValueAsString(requestDto);
             String responseJson = resourceUtils.getJsonFromResources("json/notes/update-note-response-dto.json",
                     NoteResponseDto.class);
@@ -154,7 +150,7 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
         @DisplayName("Должен вернуть ошибку, когда не существует заметки с указанным id")
         void updateNotFound() throws Exception {
             // given
-            NoteRequestDto requestDto = new NoteRequestDto("updated", "updated", "test1");
+            NoteRequestDto requestDto = new NoteRequestDto("updated", "updated");
             String requestJson = objectMapper.writeValueAsString(requestDto);
             String errorMessage = "Не найдена заметка с id=bb57298f-13ad-4ccb-8519-9c64e8288c0b";
 
@@ -178,10 +174,10 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
             ExecutorService executor = Executors.newFixedThreadPool(2);
             CyclicBarrier barrier = new CyclicBarrier(2);
 
-            NoteRequestDto requestDtoThread1 = new NoteRequestDto("thread 1", "thread 1", "test1");
+            NoteRequestDto requestDtoThread1 = new NoteRequestDto("thread 1", "thread 1");
             String requestJsonThread1 = objectMapper.writeValueAsString(requestDtoThread1);
 
-            NoteRequestDto requestDtoThread2 = new NoteRequestDto("thread 2", "thread 2", "test1");
+            NoteRequestDto requestDtoThread2 = new NoteRequestDto("thread 2", "thread 2");
             String requestJsonThread2 = objectMapper.writeValueAsString(requestDtoThread2);
 
             AtomicReference<ResultActions> resultActions1 = new AtomicReference<>();
@@ -193,8 +189,8 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
                     barrier.await();
                     resultActions1.set(
                             mockMvc.perform(put(UrlConstants.NOTE_WITH_ID_URL, NOTE_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestJsonThread1)));
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(requestJsonThread1)));
                 } catch (BrokenBarrierException | InterruptedException e) {
                     throw new RuntimeException(e);
                 } catch (Exception e) {
@@ -206,8 +202,8 @@ public class NoteControllerIntegrationTest extends AbstractIntegrationTests {
                     barrier.await();
                     resultActions2.set(
                             mockMvc.perform(put(UrlConstants.NOTE_WITH_ID_URL, NOTE_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestJsonThread2))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(requestJsonThread2))
                     );
                 } catch (Exception e) {
                     throw new RuntimeException(e);
