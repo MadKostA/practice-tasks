@@ -1,4 +1,4 @@
-package org.example.spring_practice_tasks.api.dto;
+package org.example.spring_practice_tasks.api.dto.notes;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;

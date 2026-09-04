@@ -4,7 +4,7 @@ import org.awaitility.Awaitility;
 import org.example.spring_practice_tasks.AbstractKafkaIntegrationTests;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.AuthRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteRequestDto;
 import org.example.spring_practice_tasks.api.service.AuthService;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.entity.NoteEventLog;

@@ -1,8 +1,8 @@
 package org.example.spring_practice_tasks.api.service;
 
-import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteAuthorStatsResponseDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteResponseDto;
 
 import java.net.URI;
 import java.util.List;
