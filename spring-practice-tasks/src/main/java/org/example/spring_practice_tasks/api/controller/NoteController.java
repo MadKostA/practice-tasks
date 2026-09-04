@@ -2,7 +2,10 @@ package org.example.spring_practice_tasks.api.controller;
 
 import jakarta.validation.Valid;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
-import org.example.spring_practice_tasks.api.dto.*;
+import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
+import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.PageResponseDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

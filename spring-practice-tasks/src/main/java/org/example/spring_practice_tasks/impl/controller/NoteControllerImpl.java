@@ -1,10 +1,15 @@
 package org.example.spring_practice_tasks.impl.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.controller.NoteController;
-import org.example.spring_practice_tasks.api.dto.*;
+import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
+import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.PageResponseDto;
 import org.example.spring_practice_tasks.api.enums.NoteExportFormat;
 import org.example.spring_practice_tasks.api.exceptions.NotValidFormatException;
+import org.example.spring_practice_tasks.api.service.AuthService;
 import org.example.spring_practice_tasks.api.service.ExportService;
 import org.example.spring_practice_tasks.api.service.NoteService;
 import org.example.spring_practice_tasks.api.service.RevisionService;
@@ -20,23 +25,20 @@ import java.util.UUID;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class NoteControllerImpl implements NoteController {
 
     private final NoteService noteService;
     private final RevisionService revisionService;
     private final ExportService exportService;
-
-    public NoteControllerImpl(NoteService noteService, RevisionService revisionService, ExportService exportService) {
-        this.noteService = noteService;
-        this.revisionService = revisionService;
-        this.exportService = exportService;
-    }
+    private final AuthService authService;
 
     @Override
     public ResponseEntity<NoteResponseDto> create(NoteRequestDto noteRequestDto) {
         log.info("Request to save note with title '{}'", noteRequestDto.title());
+        String currentAuthorName = authService.getCurrentAuthorName();
 
-        URI location = noteService.create(noteRequestDto);
+        URI location = noteService.create(noteRequestDto, currentAuthorName);
 
         log.info("Request to save note with title '{}' was finished", noteRequestDto.title());
         return ResponseEntity
@@ -47,8 +49,9 @@ public class NoteControllerImpl implements NoteController {
     @Override
     public ResponseEntity<NoteResponseDto> createBatch(List<NoteRequestDto> notesList) {
         log.info("Request to save list of notes, list size={}", notesList.size());
+        String currentAuthorName = authService.getCurrentAuthorName();
 
-        noteService.createBatch(notesList);
+        noteService.createBatch(notesList, currentAuthorName);
 
         log.info("Request to save list of notes was finished");
         return ResponseEntity.ok().build();
@@ -57,8 +60,9 @@ public class NoteControllerImpl implements NoteController {
     @Override
     public ResponseEntity<NoteResponseDto> update(NoteRequestDto noteDto, UUID id) {
         log.info("Request to update note with id={}", id);
+        String currentAuthorName = authService.getCurrentAuthorName();
 
-        NoteResponseDto updatedNote = noteService.update(id, noteDto);
+        NoteResponseDto updatedNote = noteService.update(id, noteDto, currentAuthorName);
 
         log.info("Request to update note with id={} was finished", id);
         return ResponseEntity.ok(updatedNote);
@@ -86,11 +90,13 @@ public class NoteControllerImpl implements NoteController {
 
     @Override
     public ResponseEntity<NoteAuthorStatsResponseDto> getStatsByAuthor(String author) {
-        log.info("Request for statistics on author={} notes", author);
+        log.info("Request for notes statistics by author={}", author);
+
+        authService.checkAuthor(author);
 
         NoteAuthorStatsResponseDto responseDto = noteService.getStatsByAuthor(author);
 
-        log.info("Request for statistics on author notes was finished");
+        log.info("Request for notes statistics by author was finished");
         return ResponseEntity.ok(responseDto);
     }
 

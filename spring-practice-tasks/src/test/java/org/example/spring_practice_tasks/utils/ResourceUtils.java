@@ -65,6 +65,10 @@ public class ResourceUtils {
         return objectMapper.readValue(resourcesPath, targetClass);
     }
 
+    public <T> T getGenericObjectFromString(String object, TypeReference<T> targetClass) throws IOException {;
+        return objectMapper.readValue(object, targetClass);
+    }
+
     public String writeAsString(Object value) throws com.fasterxml.jackson.core.JsonProcessingException {
         return objectMapper.writeValueAsString(value);
     }

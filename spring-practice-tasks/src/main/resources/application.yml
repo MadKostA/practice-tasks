@@ -1,3 +1,8 @@
+server:
+  port: 8585
+  servlet:
+    context-path: /spt-api
+
 spring:
   profiles:
     active: dev
@@ -16,10 +21,36 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-server:
-  port: 8585
-  servlet:
-    context-path: /spt-api
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.UUIDDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.trusted.packages: org.example.spring_practice_tasks.impl.model.kafka
+    producer:
+      group-id: ${spring.application.name}
+      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        acks: all
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        retries: 3
+
+    listener:
+      log-container-config: false
+
+kafka:
+  topic:
+    notes:
+      name: note-events
+      partitions: 3
+      replicas: 1
+    notes-dlt:
+      name: note-events.DLT
 
 logging:
   pattern:
@@ -29,6 +60,13 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+      springframework:
+        kafka: WARN
+        security: DEBUG
+      apache:
+        kafka: WARN
+    kafka: WARN
+
 
 
 management:

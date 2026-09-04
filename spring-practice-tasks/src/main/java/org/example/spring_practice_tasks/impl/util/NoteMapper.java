@@ -1,4 +1,4 @@
-package org.example.spring_practice_tasks.impl.config;
+package org.example.spring_practice_tasks.impl.util;
 
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface NoteMapper {
 
     @Mapping(target = "version", ignore = true)
-    Note toEntity(NoteRequestDto noteRequestDto);
+    Note toEntity(NoteRequestDto noteRequestDto, String author);
 
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

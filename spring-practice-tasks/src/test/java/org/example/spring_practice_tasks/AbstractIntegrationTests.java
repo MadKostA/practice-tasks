@@ -1,4 +1,4 @@
-package org.example.spring_practice_tasks.config;
+package org.example.spring_practice_tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.spring_practice_tasks.utils.ResourceUtils;

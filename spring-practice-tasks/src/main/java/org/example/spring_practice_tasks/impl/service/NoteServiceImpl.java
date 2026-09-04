@@ -7,16 +7,20 @@ import org.example.spring_practice_tasks.api.constants.UrlConstants;
 import org.example.spring_practice_tasks.api.dto.NoteAuthorStatsResponseDto;
 import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
 import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
-import org.example.spring_practice_tasks.api.exceptions.IncorrectAuthorException;
 import org.example.spring_practice_tasks.api.exceptions.NoteNotFoundException;
-import org.example.spring_practice_tasks.impl.repo.NoteRepository;
-import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
+import org.example.spring_practice_tasks.api.service.AuthService;
 import org.example.spring_practice_tasks.api.service.NoteService;
-import org.example.spring_practice_tasks.impl.config.NoteMapper;
-import org.example.spring_practice_tasks.impl.config.RevisionMapper;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.example.spring_practice_tasks.impl.handler.NotesLimitChecker;
+import org.example.spring_practice_tasks.impl.model.EventType;
+import org.example.spring_practice_tasks.impl.model.kafka.NoteEvent;
+import org.example.spring_practice_tasks.impl.repo.NoteRepository;
+import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
+import org.example.spring_practice_tasks.impl.service.kafka.NotesSender;
+import org.example.spring_practice_tasks.impl.util.NoteMapper;
+import org.example.spring_practice_tasks.impl.util.NotesConverter;
+import org.example.spring_practice_tasks.impl.util.RevisionMapper;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,18 +47,23 @@ public class NoteServiceImpl implements NoteService {
     private final RevisionMapper revisionMapper;
     private final CacheManager cacheManager;
     private final Counter notesCreatedCounter;
+    private final NotesSender notesSender;
+    private final AuthService authService;
 
     @Override
-    @CacheEvict(cacheNames = "noteStats", key = "#noteRequestDto.author")
-    public URI create(NoteRequestDto noteRequestDto) {
+    @CacheEvict(cacheNames = "noteStats", key = "#author")
+    public URI create(NoteRequestDto noteRequestDto, String author) {
         log.info("Creating new note with title='{}'", noteRequestDto.title());
 
         notesLimitChecker.checkNotesLimit(getTotalNotesCount());
+        String username = authService.getCurrentAuthorName();
 
-        Note note = noteMapper.toEntity(noteRequestDto);
+        Note note = noteMapper.toEntity(noteRequestDto, username);
         Note savedNote = noteRepository.save(note);
 
         notesCreatedCounter.increment();
+
+        sendKafkaNoteMessage(savedNote, EventType.CREATED);
 
         log.info("Note with title '{}' has been saved with id={}", savedNote.getTitle(), savedNote.getId());
 
@@ -67,8 +76,8 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = "noteStats", key = "#notesList.get(0).author")
-    public void createBatch(List<NoteRequestDto> notesList) {
+    @CacheEvict(cacheNames = "noteStats", key = "#author")
+    public void createBatch(List<NoteRequestDto> notesList, String author) {
 
         if (CollectionUtils.isEmpty(notesList)) {
             throw new IllegalArgumentException("В списке должна присутствовать хотя бы одна заметка");
@@ -76,8 +85,10 @@ public class NoteServiceImpl implements NoteService {
 
         long currentTotalNotesCount = getTotalNotesCount();
 
+        String username = authService.getCurrentAuthorName();
+
         for (NoteRequestDto requestDto : notesList) {
-            Note entity = noteMapper.toEntity(requestDto);
+            Note entity = noteMapper.toEntity(requestDto, username);
 
             notesLimitChecker.checkNotesLimit(currentTotalNotesCount);
             noteRepository.save(entity);
@@ -90,8 +101,8 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = "noteStats", key = "#noteRequestDto.author")
-    public NoteResponseDto update(UUID id, NoteRequestDto noteRequestDto) {
+    @CacheEvict(cacheNames = "noteStats", key = "#author")
+    public NoteResponseDto update(UUID id, NoteRequestDto noteRequestDto, String author) {
         log.info("Updating note with id={}", id);
 
         Note existsNote = noteRepository.findById(id)
@@ -100,11 +111,7 @@ public class NoteServiceImpl implements NoteService {
                     return new NoteNotFoundException(id);
                 });
 
-        if (!noteRequestDto.author().equals(existsNote.getAuthor())) {
-            String author = noteRequestDto.author();
-            log.error("Incorrect author '{}'", author);
-            throw new IncorrectAuthorException(noteRequestDto.author());
-        }
+        authService.checkAuthor(existsNote.getAuthor());
 
         NoteRevision noteRevision = revisionMapper.noteToEntity(existsNote);
 
@@ -114,6 +121,8 @@ public class NoteServiceImpl implements NoteService {
         revisionRepository.save(noteRevision);
 
         Note updatedNote = noteRepository.save(existsNote);
+
+        sendKafkaNoteMessage(updatedNote, EventType.UPDATED);
 
         log.info("Note with id={} has been updated", id);
         return noteMapper.toResponseDto(updatedNote);
@@ -154,7 +163,12 @@ public class NoteServiceImpl implements NoteService {
             return;
         }
 
+        Note note = noteOptional.get();
+        authService.checkAuthor(note.getAuthor());
+
         noteRepository.deleteById(id);
+
+        sendKafkaNoteMessage(noteOptional.get(), EventType.DELETED);
 
         Cache cache = cacheManager.getCache("noteStats");
         if (cache != null) {
@@ -169,6 +183,11 @@ public class NoteServiceImpl implements NoteService {
         log.info("Getting total notes count");
 
         return noteRepository.count();
+    }
+
+    private void sendKafkaNoteMessage(Note noteEntity, EventType eventType) {
+        NoteEvent noteEvent = NotesConverter.convertEntityToNoteEvent(noteEntity, eventType);
+        notesSender.sendMessage(noteEntity.getId(), noteEvent);
     }
 
 }

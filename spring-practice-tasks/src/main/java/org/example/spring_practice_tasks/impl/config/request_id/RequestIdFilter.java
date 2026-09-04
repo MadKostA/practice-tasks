@@ -1,4 +1,4 @@
-package org.example.spring_practice_tasks.impl.config;
+package org.example.spring_practice_tasks.impl.config.request_id;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

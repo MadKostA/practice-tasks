@@ -10,11 +10,11 @@ import java.util.UUID;
 
 public interface NoteService {
 
-    URI create(NoteRequestDto noteDto);
+    URI create(NoteRequestDto noteDto, String author);
 
-    void createBatch(List<NoteRequestDto> notesList);
+    void createBatch(List<NoteRequestDto> notesList, String author);
 
-    NoteResponseDto update(UUID id, NoteRequestDto noteDto);
+    NoteResponseDto update(UUID id, NoteRequestDto noteDto, String author);
 
     NoteResponseDto get(UUID id);
 

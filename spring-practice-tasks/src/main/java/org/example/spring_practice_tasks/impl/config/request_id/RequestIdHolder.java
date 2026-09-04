@@ -1,4 +1,4 @@
-package org.example.spring_practice_tasks.impl.config;
+package org.example.spring_practice_tasks.impl.config.request_id;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;

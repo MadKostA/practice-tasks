@@ -9,8 +9,5 @@ public record NoteRequestDto(
         String title,
 
         @NotBlank(message = "Текст заметки должен должен быть заполнен")
-        String text,
-
-        @NotBlank(message = "Автор заметки должен быть заполнен")
-        String author) {
+        String text) {
 }

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.spring_practice_tasks.api.enums.NoteExportFormat;
 import org.example.spring_practice_tasks.impl.repo.NoteRepository;
 import org.example.spring_practice_tasks.api.service.ExportService;
-import org.example.spring_practice_tasks.impl.config.NoteMapper;
+import org.example.spring_practice_tasks.impl.util.NoteMapper;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.handler.NoteExporter;
 import org.example.spring_practice_tasks.impl.model.NoteModel;

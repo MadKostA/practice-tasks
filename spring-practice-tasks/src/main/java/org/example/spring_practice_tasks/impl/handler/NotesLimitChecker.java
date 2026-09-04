@@ -1,7 +1,7 @@
 package org.example.spring_practice_tasks.impl.handler;
 
 import org.example.spring_practice_tasks.api.exceptions.NotesCountLimitException;
-import org.example.spring_practice_tasks.impl.config.ProfileSettingsConfig;
+import org.example.spring_practice_tasks.impl.config.notes_count.ProfileSettingsConfig;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
