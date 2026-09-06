@@ -2,7 +2,6 @@ package org.example.spring_practice_tasks.impl.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,7 +24,6 @@ public class DocumentEntity {
 
     private String status;
 
-    @CreatedDate
     private Instant createdAt;
 
     @LastModifiedDate

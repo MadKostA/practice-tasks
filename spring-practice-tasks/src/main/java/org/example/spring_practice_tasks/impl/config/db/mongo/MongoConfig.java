@@ -14,21 +14,13 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 @EnableMongoAuditing
 public class MongoConfig {
 
-    @Value("${mongodb.username}")
-    private String username;
-
-    @Value("${mongodb.password}")
-    private String password;
+    @Value("${mongodb.url}")
+    private String url;
 
     @Bean
     public MongoClient mongoClient() {
         MongoClientSettings settings = MongoClientSettings.builder()
-                .applyConnectionString(
-                        new ConnectionString(
-                                "mongodb://%s:%s@localhost:27017/localdb?authSource=admin"
-                                        .formatted(username, password)
-                        )
-                )
+                .applyConnectionString(new ConnectionString(url))
                 .uuidRepresentation(UuidRepresentation.STANDARD)
                 .build();
         return MongoClients.create(settings);
