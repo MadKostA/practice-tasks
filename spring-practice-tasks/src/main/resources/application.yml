@@ -20,7 +20,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
   kafka:
     bootstrap-servers: localhost:9094
     consumer:
@@ -39,9 +38,12 @@ spring:
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
         retries: 3
-
     listener:
       log-container-config: false
+
+mongodb:
+  username: mongouser
+  password: mongopass
 
 kafka:
   topic:

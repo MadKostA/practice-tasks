@@ -60,7 +60,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // Auth endpoint — без защиты
-                        .requestMatchers("/auth/token").permitAll()
+                        .requestMatchers("/auth/token", "/api/v1/documents").permitAll()
 
                         // Чтение заметок
                         .requestMatchers(HttpMethod.GET, "/notes/{id}", "/notes/export", "/notes/stats")
