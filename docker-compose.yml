@@ -97,6 +97,63 @@ services:
       DYNAMIC_CONFIG_ENABLED: 'true'
     restart: unless-stopped
 
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.5.2
+    container_name: clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"  # HTTP API (для веб-интерфейсов и инструментов)
+      - "9123:9123"  # TCP-протокол (для вставки и запросов)
+    environment:
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+    volumes:
+      - ch_data:/var/lib/clickhouse
+    ulimits:
+      nofile: 262144  # Важно для высокой нагрузки
+
+  mongo:
+    image: mongo:8.3.8
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
+      MONGO_INITDB_DATABASE: localdb
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  user-ui:
+    image: mongo-express:1.0.2
+    container_name: user-ui
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongouser
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopass
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: adminpass
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+
 volumes:
   pt_data:
   kafka_data:
+  ch_data:
+  mongo_data:
