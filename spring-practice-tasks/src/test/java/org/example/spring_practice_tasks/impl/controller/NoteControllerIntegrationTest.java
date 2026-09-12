@@ -2,8 +2,8 @@ package org.example.spring_practice_tasks.impl.controller;
 
 import org.example.spring_practice_tasks.AbstractIntegrationTests;
 import org.example.spring_practice_tasks.api.constants.UrlConstants;
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteResponseDto;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.repo.NoteRepository;
 import org.junit.jupiter.api.DisplayName;
