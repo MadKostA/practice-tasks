@@ -1,7 +1,7 @@
 package org.example.spring_practice_tasks.impl.util;
 
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteResponseDto;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.model.NoteModel;
 import org.mapstruct.Mapper;

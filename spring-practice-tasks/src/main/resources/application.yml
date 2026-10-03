@@ -20,7 +20,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  flyway:
+    enabled: false
   kafka:
     bootstrap-servers: localhost:9094
     consumer:
@@ -39,9 +40,19 @@ spring:
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
         retries: 3
-
     listener:
       log-container-config: false
+
+clickhouse:
+  url: jdbc:clickhouse://localhost:8123/default
+  user: clickhouse
+  password: clickhouse
+  driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+
+mongodb:
+  url:  "mongodb://mongouser:mongopass@localhost:27017/localdb?authSource=admin"
+  doc-processing:
+    cron: 0 * * * * *
 
 kafka:
   topic:
@@ -63,8 +74,10 @@ logging:
       springframework:
         kafka: WARN
         security: DEBUG
+        data.mongodb: DEBUG
       apache:
         kafka: WARN
+      flyway: INFO
     kafka: WARN
 
 

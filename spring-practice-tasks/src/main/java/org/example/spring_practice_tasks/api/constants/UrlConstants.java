@@ -18,4 +18,6 @@ public class UrlConstants {
     public static final String NOTE_HISTORY_URL = NOTE_URL + "/history";
     public static final String NOTE_STATS_URL = NOTE_URL + "/stats";
 
+    public static final String DOCUMENT_URL = "/documents";
+
 }

@@ -1,8 +1,8 @@
 package org.example.spring_practice_tasks.impl.util;
 
 import lombok.experimental.UtilityClass;
-import org.example.spring_practice_tasks.api.dto.NoteRequestDto;
-import org.example.spring_practice_tasks.api.dto.NoteResponseDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteRequestDto;
+import org.example.spring_practice_tasks.api.dto.notes.NoteResponseDto;
 import org.example.spring_practice_tasks.impl.entity.Note;
 import org.example.spring_practice_tasks.impl.model.EventType;
 import org.example.spring_practice_tasks.impl.model.NoteModel;

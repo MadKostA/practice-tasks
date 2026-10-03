@@ -1,9 +1,9 @@
 package org.example.spring_practice_tasks.impl.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.spring_practice_tasks.api.dto.PageResponseDto;
-import org.example.spring_practice_tasks.api.dto.RevisionResponseDto;
-import org.example.spring_practice_tasks.api.dto.SortResponseDto;
+import org.example.spring_practice_tasks.api.dto.page.PageResponseDto;
+import org.example.spring_practice_tasks.api.dto.notes.RevisionResponseDto;
+import org.example.spring_practice_tasks.api.dto.page.SortResponseDto;
 import org.example.spring_practice_tasks.api.service.RevisionService;
 import org.example.spring_practice_tasks.impl.entity.NoteRevision;
 import org.example.spring_practice_tasks.impl.repo.RevisionRepository;
